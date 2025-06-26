@@ -1,0 +1,127 @@
+<%- include('partials/header') %>
+
+<div class="app-container">
+  <!-- 사이드바 -->
+  <aside class="sidebar">
+    <nav>
+      <ul>
+        <li>
+          <a href="/dashboard"><i class="icon">🏠</i> Dashboard</a>
+        </li>
+        <li>
+          <a href="/profile"><i class="icon">👤</i> Profile</a>
+        </li>
+        <li class="active">
+          <a href="/input"><i class="icon">🧾</i> Add Expense</a>
+        </li>
+        <li>
+          <a href="/stats"><i class="icon">📊</i> State</a>
+        </li>
+        <li>
+          <a href="/result"><i class="icon">📄</i> Result</a>
+        </li>
+        <li>
+          <a href="/logout"><i class="icon">🚪</i> Signout</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- 메인 -->
+  <main class="main">
+    <div class="top-bar">
+      <div></div>
+      <div class="user-profile">
+        <img src="/img/user.png" alt="User" class="profile-img" />
+      </div>
+    </div>
+
+    <section class="summary">
+      <div class="card">
+        <h2>$<%= totalSpending %></h2>
+        <p>Total Spending</p>
+        <span class="small"><%= compareMessage %></span>
+      </div>
+      <div class="card">
+        <h2><%= emotionalCount %></h2>
+        <p>Emotional Spends</p>
+        <span class="small">+2% from yesterday</span>
+      </div>
+      <div class="card add-form">
+        <form action="input/submit" method="POST">
+          <h3>Add your expense</h3>
+          <div class="form-row">
+            <select name="type" required>
+              <option value="">Type</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+            <input
+              type="text"
+              name="category"
+              placeholder="Category"
+              required
+            />
+            <input
+              type="number"
+              name="amount"
+              placeholder="Amount ($)"
+              min="0"
+              required
+            />
+            <input type="text" name="memo" placeholder="Memo" required />
+            <input type="date" name="date" required />
+            <button type="submit">+</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 지출 리스트 -->
+    <section class="history">
+      <h2>All list</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Expense / Income</th>
+            <th>Amount</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.date %></td>
+            <td><%= item.category %></td>
+            <td><%= item.type %></td>
+            <td>
+              <span
+                class="amount-box <%= item.type === 'income' ? 'income' : 'expense' %>"
+              >
+                <%= item.amount %>$
+              </span>
+            </td>
+            <td>
+              <form action="input/delete-expense/<%= item.id %>" method="POST">
+                <button class="delete-btn" type="submit">🗑️</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+    <div class="pagination">
+      <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === currentPage) {
+      %>
+      <span class="page active"><%= i %></span>
+      <% } else { %>
+      <a href="/input?page=<%= i %>" class="page"><%= i %></a>
+      <% } %> <% } %>
+    </div>
+  </main>
+</div>
+
+<%- include('partials/footer') %>

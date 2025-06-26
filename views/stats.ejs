@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stats</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <ul>
+          <li><a href="/dashboard">🏠 Dashboard</a></li>
+          <li><a href="#">👤 Profile</a></li>
+          <li><a href="/input">➕ Add Expense</a></li>
+          <li class="active"><a href="/stats">📊 Stats</a></li>
+          <li><a href="/result">📁 Result</a></li>
+          <li><a href="#">🚪 Signout</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile.png" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Monthly Summary Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">📅</div>
+            <div class="card-title">Current Month</div>
+            <div class="card-value"><%= currentMonth %></div>
+            <div class="card-change empty">&nbsp;</div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">💳</div>
+            <div class="card-title">Monthly Spending</div>
+            <div class="card-value">$<%= totalThisMonth %></div>
+            <div class="card-change">
+              vs. Last Month: <%= monthComparison %>%
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">📈</div>
+            <div class="card-title">Highest Category</div>
+            <div class="card-value"><%= topCategory.name %></div>
+            <div class="card-change">$<%= topCategory.amount %></div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">Emotional Spend</div>
+            <div class="card-value">$<%= emotionalTotal %></div>
+            <div class="card-change">+<%= emotionalRate %>%</div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="summary">
+          <div class="card">
+            <h3>Monthly Expenses</h3>
+            <canvas id="monthlyChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Category Distribution</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const ctx1 = document.getElementById("monthlyChart").getContext("2d");
+      new Chart(ctx1, {
+        type: "line",
+        data: {
+          labels: <%- JSON.stringify(monthLabels) %>,
+          datasets: [
+            {
+              label: "Monthly Expense",
+              data: <%- JSON.stringify(monthData) %>,
+              borderColor: "#00ffe0",
+              fill: false,
+              tension: 0.4,
+            },
+          ],
+        },
+      });
+
+      const ctx2 = document.getElementById("categoryChart").getContext("2d");
+      new Chart(ctx2, {
+        type: "doughnut",
+        data: {
+          labels: <%- JSON.stringify(categoryLabels) %>,
+          datasets: [
+            {
+              data: <%- JSON.stringify(categoryData) %>,
+              backgroundColor: [
+                "#1effb2",
+                "#ff6b6b",
+                "#51c2d5",
+                "#ffc107",
+                "#9c27b0",
+              ],
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>

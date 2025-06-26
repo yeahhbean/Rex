@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <ul>
+          <li class="active"><a href="#">🏠 Dashboard</a></li>
+          <li><a href="#">👤 Profile</a></li>
+          <li><a href="/input">➕ Add Expense</a></li>
+          <li><a href="/stats">📊 Stats</a></li>
+          <li><a href="/result">📁 Result</a></li>
+          <li><a href="#">🚪 Signout</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile.png" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Top Summary First -->
+        <div class="summary">
+          <div class="card">
+            <h4>Total Expense</h4>
+            <h2>
+              $<%= (typeof totalSpending === 'number' ? totalSpending.toFixed(2)
+              : '0.00') %>
+            </h2>
+            <p>Profit is 48% more than last Month</p>
+            <div class="progress">
+              <div class="progress-bar" style="width: 80%"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Track Instantly</h4>
+            <p>Register new spending right now</p>
+            <a href="/input" class="add-now">+ Add Expense</a>
+          </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">💸</div>
+            <div class="card-title">Total Spending</div>
+            <div class="card-value">$<%= totalSpending %></div>
+            <div class="card-change">+10% from yesterday</div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">💰</div>
+            <div class="card-title">Total Transaction</div>
+            <div class="card-value"><%= totalTransaction %></div>
+            <div class="card-change">+8% from yesterday</div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">😢</div>
+            <div class="card-title">Emotional Spends</div>
+            <div class="card-value"><%= emotionalSpends %></div>
+            <div class="card-change">+2% from yesterday</div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">🆕</div>
+            <div class="card-title">New Categories</div>
+            <div class="card-value"><%= newCategories %></div>
+            <div class="card-change">+3% from yesterday</div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="summary">
+          <div class="card">
+            <h3>Spending Insight</h3>
+            <canvas id="spendingChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Monthly Report</h3>
+            <canvas id="monthlyReport"></canvas>
+          </div>
+        </div>
+
+        <!-- Top Categories Table -->
+        <section class="history">
+          <h3>Top Spending Categories</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Category</th>
+                <th>Share</th>
+                <th>Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (topCategories && topCategories.length > 0) { %> <%
+              topCategories.forEach((cat, index) => { %>
+              <tr>
+                <td><%= (index + 1).toString().padStart(2, '0') %></td>
+                <td><%= cat.category %></td>
+                <td>
+                  <div
+                    class="bar <%= cat.colorClass %>"
+                    style="width: <%= cat.share %>%"
+                  ></div>
+                </td>
+                <td><%= cat.share %> %</td>
+              </tr>
+              <% }) %> <% } else { %>
+              <tr>
+                <td colspan="4">No category data.</td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const spendingChart = document.getElementById('spendingChart').getContext('2d');
+      new Chart(spendingChart, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [
+            {
+              label: 'Emotional',
+              data: <%- JSON.stringify(emotionalData) %>,
+              backgroundColor: 'rgba(72, 145, 255, 0.8)'
+            },
+            {
+              label: 'Total',
+              data: <%- JSON.stringify(totalData) %>,
+              backgroundColor: 'rgba(191, 255, 204, 0.6)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+
+      const monthlyChart = document.getElementById('monthlyReport').getContext('2d');
+      new Chart(monthlyChart, {
+        type: 'line',
+        data: {
+          labels: <%- JSON.stringify(monthLabels) %>,
+          datasets: [{
+            label: 'Expenses',
+            data: <%- JSON.stringify(monthlyTotals) %>,
+            fill: true,
+            borderColor: '#51C2D5',
+            tension: 0.4
+          }]
+        }
+      });
+    </script>
+  </body>
+</html>
