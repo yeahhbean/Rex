@@ -10,21 +10,12 @@
   <body>
     <div class="app-container">
       <!-- Sidebar -->
-      <aside class="sidebar">
-        <ul>
-          <li><a href="/dashboard">🏠 Dashboard</a></li>
-          <li><a href="#">👤 Profile</a></li>
-          <li><a href="/input">➕ Add Expense</a></li>
-          <li class="active"><a href="/stats">📊 Stats</a></li>
-          <li><a href="/result">📁 Result</a></li>
-          <li><a href="#">🚪 Signout</a></li>
-        </ul>
-      </aside>
+      <%- include('partials/sidebar') %>
 
       <!-- Main content -->
       <main class="main">
         <div class="top-bar">
-          <img src="/img/profile.png" alt="profile" class="profile-img" />
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
         </div>
 
         <!-- Monthly Summary Cards -->
@@ -38,21 +29,28 @@
           <div class="card-box">
             <div class="card-icon">💳</div>
             <div class="card-title">Monthly Spending</div>
-            <div class="card-value">$<%= totalThisMonth %></div>
+            <div class="card-value">
+              <%= totalThisMonth.toLocaleString() %> 원
+            </div>
             <div class="card-change">
-              vs. Last Month: <%= monthComparison %>%
+              vs. Last Month: <% if (monthComparison === 'N/A') { %> N/A <% }
+              else { %> <%= monthComparison %>% <% } %>
             </div>
           </div>
           <div class="card-box">
             <div class="card-icon">📈</div>
             <div class="card-title">Highest Category</div>
             <div class="card-value"><%= topCategory.name %></div>
-            <div class="card-change">$<%= topCategory.amount %></div>
+            <div class="card-change">
+              <%= topCategory.amount.toLocaleString() %> 원
+            </div>
           </div>
           <div class="card-box">
             <div class="card-icon">🧠</div>
             <div class="card-title">Emotional Spend</div>
-            <div class="card-value">$<%= emotionalTotal %></div>
+            <div class="card-value">
+              <%= emotionalTotal.toLocaleString() %> 원
+            </div>
             <div class="card-change">+<%= emotionalRate %>%</div>
           </div>
         </div>
@@ -71,6 +69,7 @@
       </main>
     </div>
 
+    <!-- Chart Script -->
     <script>
       const ctx1 = document.getElementById("monthlyChart").getContext("2d");
       new Chart(ctx1, {
@@ -87,6 +86,17 @@
             },
           ],
         },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "top" }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
       });
 
       const ctx2 = document.getElementById("categoryChart").getContext("2d");
@@ -107,6 +117,12 @@
             },
           ],
         },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        }
       });
     </script>
   </body>

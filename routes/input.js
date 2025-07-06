@@ -1,12 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/inputController");
+const inputController = require("../controllers/inputController");
 
-// 지출 입력 화면
-router.get("/", controller.renderInputForm);
-
-// (추가: 저장 및 삭제 라우터도 여기에서 함께 관리하면 좋음)
-router.post("/submit", controller.submitExpense);
-router.post("/delete-expense/:id", controller.deleteExpense);
+router.get("/", inputController.renderInputPage); // 목록 렌더링
+router.post("/submit", inputController.submitExpense); // 지출 추가
+router.post("/delete-expense/:id", inputController.deleteExpense); // 지출 삭제
 
 module.exports = router;

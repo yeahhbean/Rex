@@ -10,21 +10,12 @@
   <body>
     <div class="app-container">
       <!-- Sidebar -->
-      <aside class="sidebar">
-        <ul>
-          <li class="active"><a href="#">🏠 Dashboard</a></li>
-          <li><a href="#">👤 Profile</a></li>
-          <li><a href="/input">➕ Add Expense</a></li>
-          <li><a href="/stats">📊 Stats</a></li>
-          <li><a href="/result">📁 Result</a></li>
-          <li><a href="#">🚪 Signout</a></li>
-        </ul>
-      </aside>
+      <%- include('partials/sidebar') %>
 
       <!-- Main content -->
       <main class="main">
         <div class="top-bar">
-          <img src="/img/profile.png" alt="profile" class="profile-img" />
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
         </div>
 
         <!-- Top Summary First -->
@@ -32,8 +23,8 @@
           <div class="card">
             <h4>Total Expense</h4>
             <h2>
-              $<%= (typeof totalSpending === 'number' ? totalSpending.toFixed(2)
-              : '0.00') %>
+              <%= (typeof totalSpending === 'number' ? totalSpending.toFixed(2)
+              : '0.00') %> 원
             </h2>
             <p>Profit is 48% more than last Month</p>
             <div class="progress">
@@ -52,25 +43,25 @@
           <div class="card-box">
             <div class="card-icon">💸</div>
             <div class="card-title">Total Spending</div>
-            <div class="card-value">$<%= totalSpending %></div>
+            <div class="card-value"><%= totalSpending || 0 %> 원</div>
             <div class="card-change">+10% from yesterday</div>
           </div>
           <div class="card-box">
             <div class="card-icon">💰</div>
             <div class="card-title">Total Transaction</div>
-            <div class="card-value"><%= totalTransaction %></div>
+            <div class="card-value"><%= totalTransaction || 0 %></div>
             <div class="card-change">+8% from yesterday</div>
           </div>
           <div class="card-box">
             <div class="card-icon">😢</div>
             <div class="card-title">Emotional Spends</div>
-            <div class="card-value"><%= emotionalSpends %></div>
+            <div class="card-value"><%= emotionalSpends || 0 %></div>
             <div class="card-change">+2% from yesterday</div>
           </div>
           <div class="card-box">
             <div class="card-icon">🆕</div>
             <div class="card-title">New Categories</div>
-            <div class="card-value"><%= newCategories %></div>
+            <div class="card-value"><%= newCategories || 0 %></div>
             <div class="card-change">+3% from yesterday</div>
           </div>
         </div>
@@ -100,24 +91,31 @@
               </tr>
             </thead>
             <tbody>
-              <% if (topCategories && topCategories.length > 0) { %> <%
-              topCategories.forEach((cat, index) => { %>
+              <% if (!topCategories || topCategories.length === 0) { %>
+              <tr>
+                <td colspan="4">No category data.</td>
+              </tr>
+              <% } else { %> <% topCategories.forEach((cat, index) => { %>
               <tr>
                 <td><%= (index + 1).toString().padStart(2, '0') %></td>
                 <td><%= cat.category %></td>
                 <td>
-                  <div
-                    class="bar <%= cat.colorClass %>"
-                    style="width: <%= cat.share %>%"
-                  ></div>
+                  <div class="bar" style="width: <%= cat.share || 0 %>%">
+                    <%= cat.share || 0 %>%
+                  </div>
                 </td>
-                <td><%= cat.share %> %</td>
+                <td><%= cat.sales || '0 원' %></td>
               </tr>
-              <% }) %> <% } else { %>
+
+              <% }); %> <% if (topCategories.length < 3) { %> <% for (let i =
+              topCategories.length; i < 3; i++) { %>
               <tr>
-                <td colspan="4">No category data.</td>
+                <td><%= (i + 1).toString().padStart(2, '0') %></td>
+                <td colspan="3" style="color: #aaa; font-style: italic">
+                  No category data.
+                </td>
               </tr>
-              <% } %>
+              <% } %> <% } %> <% } %>
             </tbody>
           </table>
         </section>
@@ -129,17 +127,17 @@
       new Chart(spendingChart, {
         type: 'bar',
         data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
           datasets: [
             {
-              label: 'Emotional',
-              data: <%- JSON.stringify(emotionalData) %>,
-              backgroundColor: 'rgba(72, 145, 255, 0.8)'
+              label: 'Emotional Spending',
+              data: <%- JSON.stringify(emotionalData || [0,0,0,0,0,0,0]) %>,
+              backgroundColor: 'rgba(255, 99, 132, 0.8)'
             },
             {
-              label: 'Total',
-              data: <%- JSON.stringify(totalData) %>,
-              backgroundColor: 'rgba(191, 255, 204, 0.6)'
+              label: 'Total Spending',
+              data: <%- JSON.stringify(totalData || [0,0,0,0,0,0,0]) %>,
+              backgroundColor: 'rgba(54, 162, 235, 0.6)'
             }
           ]
         },
@@ -155,10 +153,10 @@
       new Chart(monthlyChart, {
         type: 'line',
         data: {
-          labels: <%- JSON.stringify(monthLabels) %>,
+          labels: <%- JSON.stringify(monthLabels || []) %>,
           datasets: [{
-            label: 'Expenses',
-            data: <%- JSON.stringify(monthlyTotals) %>,
+            label: 'Monthly Expense',
+            data: <%- JSON.stringify(monthlyTotals || []) %>,
             fill: true,
             borderColor: '#51C2D5',
             tension: 0.4
