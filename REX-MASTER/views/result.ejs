@@ -1,0 +1,27 @@
+<h1><%= userId %>님의 최근 지출 내역</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>날짜</th>
+      <th>카테고리</th>
+      <th>메모</th>
+      <th>금액</th>
+      <th>감정적 소비</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% results.forEach(item => { %>
+    <tr>
+      <td><%= item.spent_at %></td>
+      <td><%= item.category_name %></td>
+      <td><%= item.memo %></td>
+      <td><%= item.amount %>원</td>
+      <td>
+        <% if (item.is_emotional) { %> ✅ (<%= item.emotional_reason %>) <% }
+        else { %> - <% } %>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
