@@ -40,6 +40,8 @@ async function analyzeExpense(expense) {
    - false일 경우 아래 결과는 작성하지 않고 공백으로 return
 - 감정 소비일 경우 emotional_reason 작성
 - feedback 작성
+- feedback은 짧고 간결하게! 재치있고 유쾌하게, 인상깊게 작성. 한 줄 정도로.
+- feedback이 재밌어야 하지만, 사용자를 비난/비방하는 등의 이유로 사용자에게 상처를 주면 안 됨
 - 전체 결과는 JSON 형식으로 응답
 
 출력 예시:
@@ -48,6 +50,18 @@ async function analyzeExpense(expense) {
    "is_emotional": true,
    "emotional_reason": "보상심리로 인한 즉흥적 소비로 보입니다.",
    "feedback": "이 정도면 오늘 지갑이 감정을 다 받아줬네요 🥲"
+}
+{
+   "expense_id": 'expense_id',
+   "is_emotional": true,
+   "emotional_reason": "스트레스 해소를 위한 감정적 소비로 보입니다.",
+   "feedback": "계좌를 보고 더 스트레스 받지 않게 계획적 소비해요 🤨"
+}
+{
+   "expense_id": 'expense_id',
+   "is_emotional": true,
+   "emotional_reason": "음주로 인한 무계획적 소비 같습니다.",
+   "feedback": "지갑도 슬퍼서 술 마실 것 같아요 😣"
 }
 {
    "expense_id": 'expense_id',
