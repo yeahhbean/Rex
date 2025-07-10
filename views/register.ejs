@@ -1,0 +1,15 @@
+<h2>회원가입</h2>
+<form method="POST" action="/auth/register">
+  <input type="text" name="id" placeholder="아이디" required />
+  <input type="password" name="password" placeholder="비밀번호" required />
+  <input type="text" name="name" placeholder="이름" required />
+  <input type="date" name="birth" required />
+  <input type="text" name="phone" placeholder="전화번호" required />
+  <input type="email" name="email" placeholder="이메일" required />
+  <select name="gender" required>
+    <option value="">성별 선택</option>
+    <option value="M">남자</option>
+    <option value="F">여자</option>
+  </select>
+  <button type="submit">가입하기</button>
+</form>

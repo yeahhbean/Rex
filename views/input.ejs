@@ -1,0 +1,181 @@
+<%- include('partials/header') %>
+
+<div class="app-container">
+  <%- include('partials/sidebar') %>
+
+  <main class="main">
+    <div class="top-bar">
+      <div></div>
+      <div class="user-profile">
+        <img src="/img/profile_user.jpg" alt="User" class="profile-img" />
+      </div>
+    </div>
+
+    <section class="summary">
+      <div class="card">
+        <h2><%= totalSpending.toLocaleString() %> 원</h2>
+        <p>Total Spending</p>
+      </div>
+      <div class="card">
+        <h2>0</h2>
+        <!-- 0으로 고정 -->
+        <p>Emotional Spends</p>
+      </div>
+
+      <div class="card add-form">
+        <form action="/input/submit" method="POST">
+          <h3>Add your expense</h3>
+          <input type="hidden" name="userId" value="<%= userId %>" />
+
+          <div class="form-row">
+            <div class="custom-dropdown" id="type-dropdown">
+              <div class="selected">Type</div>
+              <ul class="dropdown-options">
+                <li data-value="income">Income</li>
+                <li data-value="expense">Expense</li>
+              </ul>
+              <input type="hidden" name="type" id="type-input" required />
+            </div>
+
+            <!-- 카테고리 선택 -->
+            <div class="custom-dropdown" id="category-dropdown">
+              <div class="selected">카테고리를 선택하세요</div>
+              <ul class="dropdown-options">
+                <% categories.forEach(cat => { %>
+                <li data-value="<%= cat.category_id %>">
+                  <%= cat.category_name %>
+                </li>
+                <% }) %>
+              </ul>
+              <input
+                type="hidden"
+                name="category_id"
+                id="category-input"
+                required
+              />
+            </div>
+
+            <input
+              type="number"
+              name="amount"
+              placeholder="Amount (원)"
+              min="0"
+              required
+            />
+            <input type="text" name="memo" placeholder="Memo" required />
+            <input type="date" name="spent_at" required />
+            <button class="submit-btn" type="submit">+</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 지출 리스트 -->
+    <section class="history">
+      <h2>All list</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.date %></td>
+            <td><%= item.type === 'income' ? 'Income' : 'Expense' %></td>
+            <td><%= item.category %></td>
+            <td>
+              <span
+                class="amount-box <%= item.type === 'income' ? 'income' : 'expense' %>"
+              >
+                <%= Number(item.amount).toLocaleString() %> 원
+              </span>
+            </td>
+            <td>
+              <form
+                action="/input/delete-expense/<%= item.expense_id %>"
+                method="POST"
+              >
+                <button class="delete-btn" type="submit">
+                  <img
+                    src="/img/addexpense_deletebtn.png"
+                    alt="Delete"
+                    class="trash-icon"
+                  />
+                </button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="pagination">
+      <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === currentPage) {
+      %>
+      <span class="page active"><%= i %></span>
+      <% } else { %>
+      <a href="/input?page=<%= i %>" class="page"><%= i %></a>
+      <% } %> <% } %>
+    </div>
+  </main>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    function setupDropdown(dropdownId, inputId) {
+      const dropdown = document.getElementById(dropdownId);
+      const selected = dropdown.querySelector(".selected");
+      const options = dropdown.querySelector(".dropdown-options");
+      const hiddenInput = document.getElementById(inputId);
+
+      selected.addEventListener("click", () => {
+        options.style.display =
+          options.style.display === "block" ? "none" : "block";
+      });
+
+      options.querySelectorAll("li").forEach((li) => {
+        li.addEventListener("click", () => {
+          selected.textContent = li.textContent;
+          hiddenInput.value = li.dataset.value;
+          options.style.display = "none";
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target)) {
+          options.style.display = "none";
+        }
+      });
+    }
+
+    setupDropdown("type-dropdown", "type-input");
+    setupDropdown("category-dropdown", "category-input");
+
+    // 폼 제출 시 유효성 검사
+    const form = document.querySelector("form[action='/input/submit']");
+    form.addEventListener("submit", (e) => {
+      const type = document.getElementById("type-input").value;
+      const category = document.getElementById("category-input").value;
+
+      if (!type) {
+        e.preventDefault();
+        alert("💡 Type을 선택해주세요.");
+        return;
+      }
+
+      if (!category) {
+        e.preventDefault();
+        alert("💡 카테고리를 선택해주세요.");
+        return;
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

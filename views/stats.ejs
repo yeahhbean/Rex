@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stats</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <%- include('partials/sidebar') %>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">📅</div>
+            <div class="card-title">Current Month</div>
+            <div class="card-value"><%= currentMonth %></div>
+            <div class="card-change empty">&nbsp;</div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">💳</div>
+            <div class="card-title">Monthly Spending</div>
+            <div class="card-value"><%= totalThisMonthStr %> 원</div>
+            <div class="card-change">
+              vs. Last Month: <%= monthComparisonStr %>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">Emotional Spending</div>
+            <div class="card-value"><%= emotionalTotalStr %> 원</div>
+            <div class="card-change">+<%= emotionalRateStr %></div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">📈</div>
+            <div class="card-title">Top Category</div>
+            <div class="card-value"><%= topCategory.name %></div>
+            <div class="card-change"><%= topCategoryAmountStr %> 원</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="summary">
+          <div class="card">
+            <h3>Monthly Expenses</h3>
+            <canvas id="monthlyChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Category Distribution</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Chart Data Injection -->
+    <script>
+      window.monthLabels = <%- JSON.stringify(monthLabels) %>;
+      window.monthData = <%- JSON.stringify(monthData) %>;
+      window.categoryLabels = <%- JSON.stringify(categoryLabels) %>;
+      window.categoryData = <%- JSON.stringify(categoryData) %>;
+    </script>
+    <script src="/js/stats.js"></script>
+  </body>
+</html>

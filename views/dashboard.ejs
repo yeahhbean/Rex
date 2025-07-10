@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <%- include('partials/sidebar') %>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Top Summary First -->
+        <div class="summary">
+          <div class="card">
+            <h4>Total Expense</h4>
+            <h2><%= totalSpending.toLocaleString() %> 원</h2>
+            <p>
+              Expense is <%= Math.abs(changeRatioMonth) %>% <%= changeRatioMonth
+              >= 0 ? 'more' : 'less' %> than last month
+            </p>
+
+            <div class="progress">
+              <div class="progress-bar" style="width: 80%"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Track Instantly</h4>
+            <p>Register new spending right now</p>
+            <a href="/input" class="neon-button">+ Add Expense</a>
+          </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">💸</div>
+            <div class="card-title">Monthly Trend</div>
+            <div class="card-value"><%= thisMonthTotal%> 원</div>
+            <div
+              class="card-change <%= changeAmountMonth < 0 ? 'negative' : '' %>"
+            >
+              <%= Math.abs(changeAmountMonth).toLocaleString() %> 원 <%=
+              changeAmountMonth >= 0 ? '↑ more' : '↓ less' %> than last month
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">📆</div>
+            <div class="card-title">Last Spending</div>
+            <div class="card-value">
+              <%= lastSpending.toLocaleString() %> 원
+            </div>
+
+            <div class="card-change">
+              <%= (changeRatioDay >= 0 ? '+' : '') +
+              changeRatioDay.toLocaleString() %> 원 from the previous spend
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">😢</div>
+            <div class="card-title">Emotional Spends</div>
+            <div class="card-value"><%= emotionalSpends || 0 %></div>
+            <div class="card-change">+2% from yesterday</div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">🔁</div>
+            <div class="card-title">Total Transaction</div>
+            <div class="card-value"><%= transactionCount %> 회</div>
+            <div class="card-change"><%= changeRatioTx %>% from last month</div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="summary">
+          <div class="card">
+            <h3>Spending Insight</h3>
+            <canvas id="spendingChart"></canvas>
+          </div>
+          <div class="card">
+            <h3>Monthly Report</h3>
+            <canvas id="monthlyReport"></canvas>
+          </div>
+        </div>
+
+        <!-- Top Categories Table -->
+        <section class="history">
+          <h3>Top Spending Categories</h3>
+          <table class="top-category-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Category</th>
+                <th>Share</th>
+                <th>Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% topCategories.forEach((item, index) => { %>
+              <tr>
+                <td><%= ('0' + (index + 1)).slice(-2) %></td>
+                <td><%= item.category %></td>
+                <td>
+                  <div class="share-bar-container">
+                    <div
+                      class="share-bar-fill"
+                      style="width: <%= item.share %>%"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="sales-percentage"><%= item.share %>%</div>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const spendingChart = document.getElementById('spendingChart').getContext('2d');
+      new Chart(spendingChart, {
+        type: 'bar',
+        data: {
+          labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+          datasets: [
+            {
+              label: 'Emotional Spending',
+              data: <%- JSON.stringify(emotionalData || [0,0,0,0,0,0,0]) %>,
+              backgroundColor: 'rgba(255, 99, 132, 0.8)'
+            },
+            {
+              label: 'Total Spending',
+              data: <%- JSON.stringify(totalData || [0,0,0,0,0,0,0]) %>,
+              backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+
+      const monthlyChart = document.getElementById('monthlyReport').getContext('2d');
+      new Chart(monthlyChart, {
+        type: 'line',
+        data: {
+          labels: <%- JSON.stringify(monthLabels || []) %>,
+          datasets: [{
+            label: 'Monthly Expense',
+            data: <%- JSON.stringify(monthlyTotals || []) %>,
+            fill: true,
+            borderColor: '#51C2D5',
+            tension: 0.4
+          }]
+        }
+      });
+    </script>
+  </body>
+</html>
