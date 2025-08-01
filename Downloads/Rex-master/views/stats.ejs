@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stats</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <%- include('partials/sidebar') %>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">📅</div>
+            <div class="card-title">This Week</div>
+            <div class="card-value"><%= thisWeekRange %></div>
+            <div class="card-change empty">&nbsp;</div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">💳</div>
+            <div class="card-title">Weekly Spending</div>
+            <div class="card-value"><%= thisWeekExpenseStr %> 원</div>
+            <div class="card-change">
+              vs Last Week : <%= weekChangeStr.startsWith("-") ? "" : "+" %>
+              <%=weekChangeStr %>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">이번 주 감정 소비</div>
+            <div class="card-value"><%= emotionalThisWeekStr %> 원</div>
+            <div class="card-change">
+              vs Last Week : <%= emotionalChangeRatioStr.startsWith("-") ?
+              "":"+" %> <%= emotionalChangeRatioStr %>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">📈</div>
+            <div class="card-title">Top Category</div>
+            <div class="card-value"><%= topCategory.name %></div>
+            <div class="card-change"><%= topCategoryAmountStr %> 원</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+            <div class="card chart-card">
+              <h3>Weekly Spending Insight</h3>
+              <canvas id="weeklyInsightChart"></canvas>
+            </div>
+
+          <div class="card chart-card">
+            <h3>Category Distribution</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Chart Data Injection -->
+    <script>
+      window.weeklyLabels = <%- JSON.stringify(weeklyLabels) %>;
+      window.emotionalWeeklyData = <%- JSON.stringify(emotionalWeeklyData) %>;
+      window.totalWeeklyData = <%- JSON.stringify(totalWeeklyData) %>;
+      window.categoryLabels = <%- JSON.stringify(categoryLabels) %>;
+      window.categoryData = <%- JSON.stringify(categoryData) %>;
+    </script>
+    <script src="/js/stats.js"></script>
+  </body>
+</html>

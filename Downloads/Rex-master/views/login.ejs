@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <!-- Left side: 설명 영역 -->
+      <div class="login-left">
+        <div class="branding">
+          <div class="logo">⬤</div>
+          <h1>Welcome to<br /><strong>잔(액)고장</strong></h1>
+          <p>Where your wallet speaks, and your emotions get decoded by AI.</p>
+          <div class="stats-img">
+            <img src="/img/loginpage.png" alt="Statistics Preview" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side: 로그인 폼 -->
+      <div class="login-right">
+        <form action="/auth/login" method="POST" class="login-form">
+          <h2>Log in</h2>
+
+          <label for="id"><strong>User ID</strong></label>
+          <input
+            type="text"
+            id="id"
+            name="id"
+            placeholder="Enter your user ID"
+            required
+          />
+
+          <label for="password"><strong>Password</strong></label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+
+          <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember" />
+            <label for="remember">Remember me</label>
+          </div>
+
+          <button type="submit" class="btn-login">Sign In</button>
+
+          <p class="signup-text">
+            Don’t have an account? <a href="/auth/register">Sign up</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ✅ 사이드바 -->
+      <%- include('partials/sidebar') %>
+
+      <!-- ✅ 메인 콘텐츠 -->
+      <main class="main">
+        <div class="profile-container">
+          <h2 class="profile-title">👤 사용자 프로필</h2>
+
+          <div class="profile-field">
+            <span class="profile-label">아이디</span>
+            <span class="profile-value"><%= user.id %></span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label">이름</span>
+            <span class="profile-value"><%= user.name %></span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label">전화번호</span>
+            <span class="profile-value"><%= user.phone %></span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label">이메일</span>
+            <span class="profile-value"><%= user.email %></span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label">성별</span>
+            <span class="profile-value">
+              <%= user.gender === 'M' ? '남성' : user.gender === 'F' ? '여성' :
+              '기타' %>
+            </span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-label">닉네임</span>
+            <span class="profile-value"><%= user.nickname || '없음' %></span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
