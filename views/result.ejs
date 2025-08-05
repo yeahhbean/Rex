@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Emotional Spending Report</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- ✅ Sidebar -->
+      <%- include('partials/sidebar') %>
+
+      <!-- ✅ Main Section -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- ✅ Title -->
+        <h2 style="margin-bottom: 20px"><%= nickname %>님의 최근 지출 내역</h2>
+
+        <!-- ✅ Spending Table Section -->
+        <section class="history">
+          <table>
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>카테고리</th>
+                <th>메모</th>
+                <th>금액</th>
+                <th>감정적 소비</th>
+                <th>소비 피드백</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% results.forEach(item => { %>
+              <tr>
+                <td><%= item.spent_at %></td>
+                <td><%= item.category_name %></td>
+                <td><%= item.memo %></td>
+                <td class="<%= item.amount >= 0 ? 'expense' : 'income' %>">
+                  <%= Number(item.amount).toLocaleString() %>원
+                </td>
+                <td>
+                  <% if (item.is_emotional) { %> ✅ <br />
+                  <small style="color: #aaa"
+                    ><%= item.emotional_reason %></small
+                  >
+                  <% } else { %> ❌ <% } %>
+                </td>
+                <td>
+                  <% if (item.feedback && item.is_emotional) { %>
+                  <span style="font-size: 0.9rem; color: #ccc"
+                    ><%= item.feedback %></span
+                  >
+                  <% } else { %> - <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </section>
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
+          currentPage) { %>
+          <span class="page active"><%= i %></span>
+          <% } else { %>
+          <a href="/result?page=<%= i %>" class="page"><%= i %></a>
+          <% } %> <% } %>
+        </div>
+        <% } %>
+      </main>
+    </div>
+  </body>
+</html>

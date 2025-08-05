@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/login.css" />
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <!-- 왼쪽 소개 영역 -->
+      <div class="login-left">
+        <div class="branding">
+          <div class="logo">⬤</div>
+          <h1>Create Your<br /><strong>Smart Finance Profile</strong></h1>
+          <p>
+            Join us and analyze your spending habits with AI-powered insights.
+          </p>
+          <div class="stats-img">
+            <img src="/img/loginpage.png" alt="Statistics Preview" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽 회원가입 폼 -->
+      <div class="login-right">
+        <form
+          action="/auth/register"
+          method="POST"
+          class="login-form register-form"
+          onsubmit="return validateForm()"
+        >
+          <h2>Sign up</h2>
+
+          <!-- ID / Password -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="id">User ID</label>
+              <input type="text" id="id" name="id" required />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required />
+            </div>
+          </div>
+
+          <!-- email / Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="text" id="phone" name="phone" required />
+            </div>
+          </div>
+
+          <!-- Name / Birth -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="birth">Birth Date</label>
+              <input type="date" id="birth" name="birth" required />
+            </div>
+          </div>
+
+          <!-- Nickname (optional) / Gender -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nickname">Nickname (optional)</label>
+              <input type="text" id="nickname" name="nickname" />
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login">Register</button>
+
+          <p class="signup-text">
+            Already have an account? <a href="/auth/login">Log in</a>
+          </p>
+        </form>
+
+        <script>
+          function validateForm() {
+            const id = document.getElementById("id").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const name = document.getElementById("name").value.trim();
+            const birth = document.getElementById("birth").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const gender = document.getElementById("gender").value;
+
+            // 정규표현식
+            const phoneRegex = /^01[0-9]-?\d{3,4}-?\d{4}$/;
+            const passwordRegex = /^.{6,}$/;
+            const nameRegex = /^[가-힣a-zA-Z\s]{2,}$/;
+            const idRegex = /^[a-zA-Z0-9_]{4,}$/; // 영문/숫자/밑줄 4자 이상
+
+            if (!idRegex.test(id)) {
+              alert("ID는 영문/숫자 조합 4자 이상이어야 합니다.");
+              return false;
+            }
+
+            if (!passwordRegex.test(password)) {
+              alert("비밀번호는 최소 6자 이상이어야 합니다.");
+              return false;
+            }
+
+            if (!nameRegex.test(name)) {
+              alert("이름은 한글 또는 영문으로 2자 이상 입력해주세요.");
+              return false;
+            }
+
+            if (!birth) {
+              alert("생년월일을 입력해주세요.");
+              return false;
+            }
+
+            if (!phoneRegex.test(phone)) {
+              alert("올바른 전화번호 형식으로 입력해주세요. 예: 010-1234-5678");
+              return false;
+            }
+
+            if (!gender) {
+              alert("성별을 선택해주세요.");
+              return false;
+            }
+
+            return true;
+          }
+        </script>
+      </div>
+    </div>
+  </body>
+</html>

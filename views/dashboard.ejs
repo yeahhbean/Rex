@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <%- include('partials/sidebar') %>
+
+      <!-- Main content -->
+      <main class="main">
+        <div class="top-bar">
+          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+        </div>
+
+        <!-- Top Summary First -->
+        <div class="summary">
+          <div class="card">
+            <h4 class="summary-title">📊 This Month Summary</h4>
+            <div class="summary-stats">
+              <div class="summary-block expense">
+                <span class="label">💸 Expense</span>
+                <span class="value"
+                  ><%= thisMonthTotal.toLocaleString() %> 원</span
+                >
+              </div>
+              <div class="summary-block income">
+                <span class="label">💰 Income</span>
+                <span class="value"
+                  ><%= thisMonthIncome.toLocaleString() %> 원</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="track-instantly-row">
+              <div class="text-block">
+                <h4>Register new spending right now</h4>
+              </div>
+              <a href="/input" class="neon-button big">+ Add Expense</a>
+            </div>
+          </div>
+
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-card">
+          <div class="card-box">
+            <div class="card-icon">💸</div>
+            <div class="card-title">Monthly Trend</div>
+            <div class="card-value">
+              <%= thisMonthTotal.toLocaleString() %> 원
+            </div>
+            <div
+              class="card-change <%= changeAmountMonth < 0 ? 'negative' : '' %>"
+            >
+              <%= changeRatioMonth >= 0 ? '+' : '' %> <%= changeRatioMonth %>%
+              from last month
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="card-icon">📆</div>
+            <div class="card-title">Last Spending</div>
+            <div class="card-value">
+              <%= lastSpendingAmount.toLocaleString() %> 원
+            </div>
+
+            <div class="card-change">
+              Category: <%= lastSpendingCategory || 'Unknown' %>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">😢</div>
+            <div class="card-title">Emotional Spends</div>
+            <div class="card-value"><%= emotionalSpends %> 회</div>
+            <div
+              class="card-change <%= emotionalChangeRatio < 0 ? 'negative' : '' %>"
+            >
+              <%= (emotionalChangeRatio >= 0 ? '+ ' : '') + emotionalChangeRatio
+              %>% from last month
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">Emotion Ratio</div>
+            <div class="emoji-display"><%= emotionalFeedback %></div>
+          </div>
+        </div>
+
+        <!-- Chart Section: 카드 2개로 분리 -->
+        <div class="bottom">
+          <div class="card top-category">
+            <h3>Top 3 Categories This Month</h3>
+            <canvas id="topCategoryChart"></canvas>
+          </div>
+
+          <div class="card monthly-report">
+            <h3>Monthly Report</h3>
+            <canvas id="monthlyReport"></canvas>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      const topCategoryChart = document.getElementById('topCategoryChart').getContext('2d');
+      new Chart(topCategoryChart, {
+        type: 'bar',
+        data: {
+          labels: <%- JSON.stringify(top3Categories.map(item => item.category)) %>,
+          datasets: [{
+            label: 'Total Expense (₩)',
+            data: <%- JSON.stringify(top3Categories.map(item => item.amount)) %>,
+            backgroundColor: [
+              'rgba(104, 120, 255, 0.8)', // Soft Indigo
+              'rgba(255, 127, 127, 0.8)', // Coral Pink
+              'rgba(255, 193, 79, 0.8)'   // Amber Gold
+            ],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toLocaleString() + ' 원';
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const monthlyChart = document.getElementById('monthlyReport').getContext('2d');
+      new Chart(monthlyChart, {
+        type: 'line',
+        data: {
+          labels: <%- JSON.stringify(monthLabels || []) %>,
+          datasets: [{
+            label: 'Monthly Expense',
+            data: <%- JSON.stringify(monthlyTotals || []) %>,
+            fill: true,
+            borderColor: '#51C2D5',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toLocaleString() + ' 원';
+                }
+              }
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
