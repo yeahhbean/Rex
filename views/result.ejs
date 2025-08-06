@@ -7,19 +7,23 @@
   </head>
   <body>
     <div class="app-container">
-      <!-- ✅ Sidebar -->
+      <!-- Sidebar -->
       <%- include('partials/sidebar') %>
 
-      <!-- ✅ Main Section -->
+      <!--  Main Section -->
       <main class="main">
         <div class="top-bar">
-          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+          <img
+            src="<%= (user.profile_image && user.profile_image.trim?.() !== '' && user.profile_image !== 'null') ? user.profile_image : '/img/profile_user.jpg' %>"
+            alt="profile"
+            class="profile-img"
+          />
         </div>
 
-        <!-- ✅ Title -->
+        <!--  Title -->
         <h2 style="margin-bottom: 20px"><%= nickname %>님의 최근 지출 내역</h2>
 
-        <!-- ✅ Spending Table Section -->
+        <!--  Spending Table Section -->
         <section class="history">
           <table>
             <thead>
@@ -49,7 +53,7 @@
                   <% } else { %> ❌ <% } %>
                 </td>
                 <td>
-                  <% if (item.feedback && item.is_emotional) { %>
+                  <% if (item.feedback) { %>
                   <span style="font-size: 0.9rem; color: #ccc"
                     ><%= item.feedback %></span
                   >

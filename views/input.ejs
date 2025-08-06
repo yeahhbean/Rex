@@ -7,7 +7,11 @@
     <div class="top-bar">
       <div></div>
       <div class="user-profile">
-        <img src="/img/profile_user.jpg" alt="User" class="profile-img" />
+        <img
+          src="<%= (user.profile_image && user.profile_image.trim?.() !== '' && user.profile_image !== 'null') ? user.profile_image : '/img/profile_user.jpg' %>"
+          alt="profile"
+          class="profile-img"
+        />
       </div>
     </div>
 

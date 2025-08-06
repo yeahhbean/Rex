@@ -15,7 +15,7 @@
       <!-- Main content -->
       <main class="main">
         <div class="top-bar">
-          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+          <img src="<%= (user.profile_image && user.profile_image.trim?.() !== '' && user.profile_image !== 'null') ? user.profile_image : '/img/profile_user.jpg' %>" alt="profile" class="profile-img" />
         </div>
 
         <!-- Top Summary First -->

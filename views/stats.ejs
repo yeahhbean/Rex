@@ -15,7 +15,7 @@
       <!-- Main content -->
       <main class="main">
         <div class="top-bar">
-          <img src="/img/profile_user.jpg" alt="profile" class="profile-img" />
+          <img src="<%= (user.profile_image && user.profile_image.trim?.() !== '' && user.profile_image !== 'null') ? user.profile_image : '/img/profile_user.jpg' %>" alt="profile" class="profile-img" />
         </div>
 
         <!-- Summary Cards -->
@@ -23,7 +23,12 @@
           <div class="card-box">
             <div class="card-icon">📅</div>
             <div class="card-title">This Week</div>
-            <div class="card-value"><%= thisWeekRange %></div>
+            <div class="card-value">
+              <% const rangeParts = thisWeekRange.split(" ~ "); %>
+              <span><%= rangeParts[0] %></span>
+              <span class="wave">~</span><br>
+              <span><%= rangeParts[1] %></span>
+            </div>
             <div class="card-change empty">&nbsp;</div>
           </div>
 

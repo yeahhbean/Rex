@@ -35,12 +35,11 @@ async function analyzeUnprocessedExpenses(userId) {
             });
 
             db.run(
-              `INSERT INTO emotional_feedback (expense_id, is_emotional, feedback)
-   VALUES (?, ?, ?)`,
+              `INSERT INTO emotional_feedback (expense_id, is_emotional, feedback) VALUES (?, ?, ?)`,
               [
                 row.expense_id,
                 result.is_emotional ? 1 : 0,
-                result.feedback || "", // ✅ 3개만 전달
+                result.feedback || "", // 3개만 전달
               ],
               (err) => {
                 if (err) console.error("분석 결과 저장 실패:", err);
@@ -69,7 +68,7 @@ router.get("/", verifyToken, async (req, res) => {
   const currentPage = parseInt(req.query.page) || 1;
   const offset = (currentPage - 1) * itemsPerPage;
 
-  // ✅ 분석 안 된 항목이 존재하는지 확인
+  // 분석 안 된 항목이 존재하는지 확인
   db.get(
     `
     SELECT COUNT(*) as count
@@ -89,7 +88,7 @@ router.get("/", verifyToken, async (req, res) => {
         await analyzeUnprocessedExpenses(userId);
       }
 
-      // 👉 닉네임 조회
+      // 닉네임 조회
       db.get(
         `SELECT nickname FROM user_profile WHERE id = ?`,
         [userId],
@@ -101,7 +100,7 @@ router.get("/", verifyToken, async (req, res) => {
 
           const nickname = profile?.nickname || userId;
 
-          // ✅ 전체 페이지 수 계산
+          // 전체 페이지 수 계산
           db.get(
             `
           SELECT COUNT(*) AS totalCount
@@ -118,24 +117,24 @@ router.get("/", verifyToken, async (req, res) => {
               const totalItems = countResult.totalCount;
               const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-              // ✅ 실제 페이지 데이터 조회
+              // 실제 페이지 데이터 조회
               db.all(
                 `
-              SELECT 
-                e.expense_id,
-                c.category_name,
-                e.memo,
-                e.amount,
-                e.spent_at,
-                ef.is_emotional,
-                ef.feedback
-              FROM expenses e
-              JOIN categories c ON e.category_id = c.category_id
-              JOIN emotional_feedback ef ON e.expense_id = ef.expense_id AND ef.is_emotional = 1
-              WHERE e.id = ? AND e.type = 'expense'
-              ORDER BY e.spent_at DESC
-              LIMIT ? OFFSET ?
-            `,
+                SELECT 
+                  e.expense_id,
+                  c.category_name,
+                  e.memo,
+                  e.amount,
+                  e.spent_at,
+                  ef.is_emotional,
+                  ef.feedback
+                FROM expenses e
+                JOIN categories c ON e.category_id = c.category_id
+                JOIN emotional_feedback ef ON e.expense_id = ef.expense_id
+                WHERE e.id = ? AND e.type = 'expense'
+                ORDER BY e.spent_at DESC
+                LIMIT ? OFFSET ?
+              `,
                 [userId, itemsPerPage, offset],
                 (err3, rows) => {
                   if (err3) {

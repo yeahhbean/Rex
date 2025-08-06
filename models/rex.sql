@@ -63,7 +63,7 @@ create table emotional_feedback(
     feedback_id int AUTO_INCREMENT primary key,
     expense_id int not null,
     is_emotional boolean not null,
-    feedback test,
+    feedback text,
     analyzed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (expense_id) REFERENCES expenses(expense_id) ON DELETE CASCADE
 );

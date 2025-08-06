@@ -15,6 +15,7 @@ function initDB() {
         `
         create table IF NOT EXISTS user_private(
           id varchar(20) primary key, -- id
+          oauth_provider varchar(20) DEFAULT NULL, -- 예: 'google', 'kakao', 'naver'
           password varchar(30), -- 비번
           name varchar(20) not null, -- 이름
           birth date not null, -- 생년월일

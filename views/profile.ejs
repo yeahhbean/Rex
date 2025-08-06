@@ -1,49 +1,199 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Profile</title>
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <div class="app-container">
-      <!-- ✅ 사이드바 -->
-      <%- include('partials/sidebar') %>
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<script src="/js/profile.js"></script>
+<body>
+  <div class="app-container">
+    <%- include('partials/sidebar') %>
 
-      <!-- ✅ 메인 콘텐츠 -->
-      <main class="main">
-        <div class="profile-container">
-          <h2 class="profile-title">👤 사용자 프로필</h2>
-
-          <div class="profile-field">
-            <span class="profile-label">아이디</span>
-            <span class="profile-value"><%= user.id %></span>
+    <main class="main">
+      <div class="profile-container">
+        <form action="/profile/update" method="POST" enctype="multipart/form-data">
+        <!-- 👤 사용자 정보 상단 영역 -->
+        <div class="profile-header">
+          <div class="profile-avatar-wrapper">
+            <img class="profile-avatar" src="<%= (user.profile_image && user.profile_image !== 'null' && user.profile_image.trim?.() !== '') ? user.profile_image : '/img/profile_user.jpg' %>" alt="프로필 이미지">
+            <label for="profileUpload" class="camera-icon">
+              <img src="/img/camera.png" alt="카메라 아이콘" />
+            </label>
+            <input type="file" name="profile_image" id="profileUpload" accept="image/png, image/jpeg" hidden />
           </div>
-          <div class="profile-field">
-            <span class="profile-label">이름</span>
-            <span class="profile-value"><%= user.name %></span>
-          </div>
-          <div class="profile-field">
-            <span class="profile-label">전화번호</span>
-            <span class="profile-value"><%= user.phone %></span>
-          </div>
-          <div class="profile-field">
-            <span class="profile-label">이메일</span>
-            <span class="profile-value"><%= user.email %></span>
-          </div>
-          <div class="profile-field">
-            <span class="profile-label">성별</span>
-            <span class="profile-value">
-              <%= user.gender === 'M' ? '남성' : user.gender === 'F' ? '여성' :
-              '기타' %>
-            </span>
-          </div>
-          <div class="profile-field">
-            <span class="profile-label">닉네임</span>
-            <span class="profile-value"><%= user.nickname || '없음' %></span>
+          <div class="profile-info">
+            <div class="profile-username"><%= user.name %></div>
+            <div class="profile-email"><%= user.email %></div>
           </div>
         </div>
-      </main>
-    </div>
-  </body>
+
+        <!--프로필 수정 폼 -->
+          <div class="profile-field">
+            <label>아이디</label>
+            <input type="text" value="<%= user.id %>" disabled />
+          </div>
+
+          <div class="profile-field">
+            <label>이름</label>
+            <input type="text" name="name" value="<%= user.name %>" required />
+          </div>
+
+          <div class="profile-field">
+            <label>전화번호</label>
+            <input type="tel" name="phone" value="<%= user.phone %>" required />
+          </div>
+
+          <% if (!isSocial) { %>
+            <div class="profile-field">
+              <label>이메일</label>
+              <input type="email" name="email" value="<%= user.email %>" required />
+            </div>
+          <% } else { %>
+            <div class="profile-field">
+              <label>이메일</label>
+              <input type="email" value="<%= user.email %>" disabled />
+              <!-- 수정 불가하되 서버에 값은 전달 -->
+              <input type="hidden" name="email" value="<%= user.email %>" />
+            </div>
+          <% } %>
+
+
+          <div class="profile-field">
+            <label>성별</label>
+            <select name="gender">
+              <option value="M" <%= user.gender === 'M' ? 'selected' : '' %>>남성</option>
+              <option value="F" <%= user.gender === 'F' ? 'selected' : '' %>>여성</option>
+            </select>
+          </div>
+
+          <div class="profile-field">
+            <label>닉네임</label>
+            <input type="text" name="nickname" value="<%= user.nickname || '' %>" />
+          </div>
+
+          <% if (!isSocial) { %>
+            <div class="profile-field">
+              <label>비밀번호 (변경 시 입력)</label>
+              <input type="password" name="password" placeholder="새 비밀번호" />
+            </div>
+          <% } %>
+
+          <button class="btn-save" type="submit">Save changes</button>
+        </form>
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form[action='/profile/update']");
+            const fileInput = document.getElementById("profileUpload");
+            const profileImage = document.querySelector(".profile-avatar");
+            const submitBtn = form.querySelector("button[type='submit']");
+
+            // 초기값 저장
+            const originalValues = {
+              name: form.name.value,
+              phone: form.phone.value,
+              email: form.email.value,
+              nickname: form.nickname.value,
+              gender: form.gender.value,
+              password: '',
+              imageChanged: false
+            };
+
+            // 입력값 변화 감지
+            const inputs = form.querySelectorAll("input:not([type='file']), select");
+            inputs.forEach(input => {
+              input.addEventListener("input", () => {
+                submitBtn.disabled = !isChanged(form);
+              });
+            });
+
+            // 이미지 변경 감지 및 미리보기
+            fileInput.addEventListener("change", function () {
+              const file = this.files[0];
+              if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                  profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                originalValues.imageChanged = true;
+              }
+              submitBtn.disabled = !isChanged(form);
+            });
+
+            // 변경 여부 판단
+            function isChanged(form) {
+              return (
+                form.name.value !== originalValues.name ||
+                form.phone.value !== originalValues.phone ||
+                form.email.value !== originalValues.email ||
+                form.nickname.value !== originalValues.nickname ||
+                form.gender.value !== originalValues.gender ||
+                (form.password && form.password.value.trim() !== "") ||
+                originalValues.imageChanged
+              );
+            }
+
+            // 저장 버튼 초기 비활성화
+            submitBtn.disabled = true;
+
+            // 유효성 검사
+            function validateProfileForm() {
+              const name = form.name.value.trim();
+              const phone = form.phone.value.trim();
+              const email = form.email.value.trim();
+              const gender = form.gender.value;
+              const password = form.password?.value.trim();
+
+              const phoneRegex = /^01[0-9]-?\d{3,4}-?\d{4}$/;
+              const passwordRegex = /^.{6,}$/;
+              const nameRegex = /^[가-힣a-zA-Z\s]{2,}$/;
+              const emailRegex = /^[^\s@]+@[^\s@]+$/;
+
+              if (!nameRegex.test(name)) {
+                alert("이름은 한글 또는 영문으로 2자 이상 입력해주세요.");
+                return false;
+              }
+
+              if (!phoneRegex.test(phone)) {
+                alert("올바른 전화번호 형식으로 입력해주세요. 예: 010-1234-5678");
+                return false;
+              }
+
+              if (!emailRegex.test(email)) {
+                alert("올바른 이메일 형식으로 입력해주세요.");
+                return false;
+              }
+
+              if (!["M", "F"].includes(gender)) {
+                alert("성별을 선택해주세요.");
+                return false;
+              }
+
+              if (password && !passwordRegex.test(password)) {
+                alert("비밀번호는 최소 6자 이상이어야 합니다.");
+                return false;
+              }
+
+              return true;
+            }
+
+            // 폼 제출 전 유효성 검사
+            form.addEventListener("submit", function (e) {
+              if (!validateProfileForm()) {
+                e.preventDefault();
+              }
+            });
+          });
+        </script>
+        <% if (mustChangePhone) { %>
+          <script>
+            alert("⚠️ 전화번호를 수정해야 모든 기능을 이용할 수 있습니다.");
+          </script>
+        <% } %>
+
+      </div>
+    </main>
+  </div>
+</body>
 </html>

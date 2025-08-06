@@ -321,3 +321,30 @@ select#gender option {
   background-color: #303030;
   opacity: 8%;
 }
+
+.social-login {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.kakao-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fee500;
+  font-weight: 500;
+  font-size: 14px;
+  color: #000;
+  cursor: pointer;
+}
+
+.kakao-button img {
+  height: 20px;
+  margin-right: 8px;
+}

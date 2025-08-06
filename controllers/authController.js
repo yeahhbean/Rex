@@ -2,14 +2,30 @@ const bcrypt = require("bcryptjs");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("expenses.db");
 
+exports.kakaoLoginCallback = (req, res) => {
+  const user = req.user;
+
+  const token = jwt.sign(
+    { id: user.id, name: user.name, oauth_provider: "kakao" },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  res.redirect("/dashboard");
+};
+
 exports.googleLoginCallback = async (req, res) => {
-  const user = req.user; // passport.js에서 전달된 Google 사용자 정보
-  const googleId = user.id; // Google 사용자 고유 ID를 우리 서비스의 id로 사용
+  const user = req.user;
+  const googleId = user.id;
   const email = user.emails?.[0]?.value;
   const picture = user.photos?.[0]?.value || null;
   const name = user.displayName;
 
-  // user_private에 사용자 존재 확인
   db.get(`SELECT * FROM user_private WHERE id = ?`, [googleId], (err, row) => {
     if (err) {
       console.error("DB 에러:", err);
@@ -17,10 +33,10 @@ exports.googleLoginCallback = async (req, res) => {
     }
 
     if (!row) {
-      // 사용자 등록
+      // 신규 사용자 등록
       db.run(
-        `INSERT INTO user_private (id, password, name, birth, phone, email, gender)
-         VALUES (?, '', ?, '', '', ?, '')`,
+        `INSERT INTO user_private (id, password, name, birth, phone, email, gender, oauth_provider)
+         VALUES (?, '', ?, '2000-01-01', '010-0000-0000', ?, 'M', 'google')`,
         [googleId, name, email],
         (err2) => {
           if (err2) {
@@ -30,8 +46,8 @@ exports.googleLoginCallback = async (req, res) => {
       );
 
       db.run(
-        `INSERT INTO user_profile (id, nickname) VALUES (?, ?)`,
-        [googleId, name],
+        `INSERT INTO user_profile (id, nickname, profile_image) VALUES (?, ?, ?)`,
+        [googleId, name, picture],
         (err3) => {
           if (err3) {
             console.error("user_profile 등록 실패:", err3.message);
@@ -40,10 +56,20 @@ exports.googleLoginCallback = async (req, res) => {
       );
     }
 
-    // JWT 발급
-    const token = jwt.sign({ id: googleId }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    // JWT 발급 시 oauth_provider 포함
+    const token = jwt.sign(
+      {
+        id: googleId,
+        name,
+        email,
+        phone: row?.phone || "010-0000-0000",
+        oauth_provider: row?.oauth_provider || "google",
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -114,7 +140,6 @@ exports.registerUser = async (req, res) => {
 };
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-
 exports.loginUser = async (req, res) => {
   const { id, password } = req.body;
 
@@ -138,16 +163,25 @@ exports.loginUser = async (req, res) => {
       );
     }
 
-    //JWT 생성
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "7d", // 7일간 유효
-    });
+    // JWT에 oauth_provider 포함
+    const token = jwt.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        oauth_provider: user.oauth_provider || null, // 일반 로그인은 null
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d", // 7일간 유효
+      }
+    );
 
-    //HTTP-only 쿠키로 저장
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // HTTPS에서만 사용 시 true
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.send(
